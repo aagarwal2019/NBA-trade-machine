@@ -71,6 +71,3 @@ Under-the-cap teams can absorb up to the cap without matching. The checker flags
 - **Ages & specific positions:** BBGM (Basketball GM) 2025-26 save file
 - **CBA constants:** 2025-26 NBA CBA (cap $141M, tax $172.346M, aprons $182.836M / $189.536M)
 
-## License
-
-MIT
