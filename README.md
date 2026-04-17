@@ -1,36 +1,76 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NBA Trade Machine
+
+A web app for building and validating multi-team NBA trades using real 2025-26 rosters, salaries, and CBA rules.
+
+Live rosters reflect mid-season trades (Luka to LAL, AD to WAS, Butler to GSW, Trae to WAS, Fox to SAS, Garland to LAC, Lillard/Holiday to POR, etc.).
+
+## Features
+
+- All 30 NBA teams with current rosters and salaries
+- 2–4 team trades — drag players onto the trade block from any participating team
+- Virtualized roster lists (smooth scrolling through full rosters)
+- Search and position filter on each team card
+- Live trade summary with incoming/outgoing salary per team
+- **Legality checker** using the 125% + $250K salary-matching rule (plus apron-aware guardrails)
+- Dark theme UI with sticky header and responsive layout
+
+## Tech Stack
+
+- **Next.js 16** (App Router) + **React 19** + **TypeScript**
+- **Tailwind CSS 4** + **shadcn/ui** components
+- **Zustand** for trade state
+- **@tanstack/react-virtual** for virtualized roster lists
+- **lucide-react** icons
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Build for production:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm run start
+```
 
-## Learn More
+## Project Structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+nba-trade-machine/
+├── app/                      # Next.js App Router entry
+├── components/
+│   └── trade/                # TradeMachine, TeamCard, TradeBlock, TradeSummary, TeamSelector
+├── lib/
+│   ├── types.ts              # Player, Team, Participant types
+│   └── trade-rules.ts        # Salary-matching + apron logic
+├── store/
+│   └── tradeStore.ts         # Zustand store for participants/selections
+└── data/
+    ├── teams.json            # 30 teams with cap/apron context
+    └── players.json          # 440 players with salary + contract data
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Salary Matching Rule
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+For over-the-cap teams, each team's **incoming** salary must fit within:
 
-## Deploy on Vercel
+```
+maxIncoming = outgoing * 1.25 + $250,000
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Under-the-cap teams can absorb up to the cap without matching. The checker flags apron violations (first apron $182.836M, second apron $189.536M) which restrict aggregating salaries and taking back more than you send.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Data Sources
+
+- **Rosters & salaries:** ESPN Stats API (`site.api.espn.com/apis/site/v2/sports/basketball/nba/teams/{abbr}/roster`)
+- **Ages & specific positions:** BBGM (Basketball GM) 2025-26 save file
+- **CBA constants:** 2025-26 NBA CBA (cap $141M, tax $172.346M, aprons $182.836M / $189.536M)
+
+## License
+
+MIT
